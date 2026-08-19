@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+void fcfs();
+void sjf();
+
+void roundRobinPreemptive();
+void roundRobinNonPreemptive();
+
+void srtf();
+
+void priorityNonPreemptive();
+void priorityPreemptive();
