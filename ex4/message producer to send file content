@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+struct message {
+long type;
+char text[500];
+};
+int main()
+{
+key_t key;
+int msgid;
+FILE *fp;
+struct message msg;
+int ch, i = 0;
+key = ftok("filemsg", 65);
+if (key == -1) { perror("ftok"); return 1; }
+msgid = msgget(key, 0666 | IPC_CREAT);
+if (msgid == -1) { perror("msgget"); return 1; }
+fp = fopen("input.txt", "r");
+if(fp == NULL) {
+printf("Error: input.txt not found in this folder.\n");
+return 1;
+}
+while((ch = fgetc(fp)) != EOF && i < 499) {
+msg.text[i++] = ch;
+}
+msg.text[i] = '\0';
+msg.type = 1;
+fclose(fp);
+if (msgsnd(msgid, &msg, sizeof(msg.text), 0) == -1) {
+perror("msgsnd failed");
+return 1;
+}
+printf("File content sent successfully.\n");
+return 0;
+}
