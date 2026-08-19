@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+int main()
+{
+int i;
+key_t key;
+int shmid;
+int *matrix_buf;
+key = ftok("matrix", 65);
+if (key == -1) { perror("ftok"); return 1; }
+// Allocate space for 8 integers total (Matrix A: 0-3, Matrix B: 4-7)
+shmid = shmget(key, 8 * sizeof(int), 0666 | IPC_CREAT);
+if (shmid == -1) { perror("shmget"); return 1; }
+matrix_buf = (int *)shmat(shmid, NULL, 0);
+if (matrix_buf == (int *)-1) { perror("shmat"); return 1; }
+printf("Enter 2x2 Matrix A (4 integers sequentially):\n");
+for( i = 0; i < 4; i++) {
+scanf("%d", &matrix_buf[i]);
+}
+printf("Enter 2x2 Matrix B (4 integers sequentially):\n");
+for( i = 0; i < 4; i++) {
+scanf("%d", &matrix_buf[i + 4]);
+}
+printf("Both matrices stored sequentially and sent to P2.\n");
+shmdt(matrix_buf);
+return 0;
+}
