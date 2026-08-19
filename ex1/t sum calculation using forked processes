@@ -1,0 +1,63 @@
+#include<stdio.h>
+#include<unistd.h>
+#include<sys/wait.h>
+int main()
+{
+   int n,i,sum,sum1,sum2;
+   sum=0;
+   sum1=0;
+   sum2=0;
+   pid_t pid3,pid2;
+   printf("Enter the number elements");
+   scanf("%d",&n);
+   pid2=fork();
+   if(pid2==0)
+   {
+      for( i=0;i<=n ;i++)
+      {
+         if(i%2!=0)
+         {
+           sum=sum+i;
+         }
+      }
+      printf("Sum of odd number is %d\n",sum);
+      printf("process2 pid=%d,parent ppid=%d\n",getpid(),getppid());
+    }
+   else if(pid2>0)
+   {
+      wait(NULL);
+      for(i=0;i<=n;i++)
+      {
+         sum1=sum1+i;
+      }
+      printf("sum of n numbers %d\n",sum1);
+      printf("process 1 pid=%d,parent ppid=%d\n",getpid(),getppid());
+      pid3=fork();
+      if(pid3==0)
+      {
+         for(i=0;i<n;i++)
+         {
+            if(i%2==0)
+            {
+               sum2=sum2+i;
+            }
+         }
+          printf("Sum  of even number is %d\n",sum2);
+          printf("process 3 pid=%d,parent ppid=%d\n",getpid(),getppid());
+         }
+      else if(pid3>0)
+      {
+
+         wait(NULL);
+         printf("process1 pid=%d,parent ppid=%d\n",getpid(),getppid());
+      }
+      else{
+         perror("No Process");
+      }
+
+      }
+    else{
+       perror("No Process");
+    }
+   return 0;
+}
