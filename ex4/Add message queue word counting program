@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+struct message {
+long type;
+char text[100];
+};
+int main()
+{
+key_t key;
+int i;
+int msgid;
+struct message msg;
+int words = 0;
+int in_word = 0;
+key = ftok("msgfile", 65);
+if (key == -1) { perror("ftok"); return 1; }
+msgid = msgget(key, 0666 | IPC_CREAT);
+if (msgid == -1) { perror("msgget"); return 1; }
+if (msgrcv(msgid, &msg, sizeof(msg.text), 1, 0) == -1) {
+perror("msgrcv failed");
+return 1;
+}
+printf("Message received: %s\n", msg.text);
+// Robust structural evaluation tracking structural word state shifts
+for( i = 0; msg.text[i] != '\0'; i++) {
+if (msg.text[i] != ' ' && msg.text[i] != '\t') {
+if (!in_word) {
+words++;
+in_word = 1;
+}
+} else {
+in_word = 0;
+}
+}
+printf("Number of words = %d\n", words);
+msgctl(msgid, IPC_RMID, NULL);
+return 0;
+}
