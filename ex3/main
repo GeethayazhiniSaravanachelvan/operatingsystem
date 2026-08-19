@@ -1,0 +1,65 @@
+#include "head.h"
+
+int main()
+{
+    int choice;
+
+    do
+    {
+        printf("\n==========================================");
+        printf("\n      CPU SCHEDULING ALGORITHMS");
+        printf("\n==========================================");
+        printf("\n1. First Come First Serve (FCFS)");
+        printf("\n2. Shortest Job First (SJF)");
+        printf("\n3. Round Robin - Preemptive");
+        printf("\n4. Round Robin - Non-Preemptive");
+        printf("\n5. Shortest Remaining Time First (SRTF)");
+        printf("\n6. Priority Scheduling - Non-Preemptive");
+        printf("\n7. Priority Scheduling - Preemptive");
+        printf("\n8. Exit");
+
+        printf("\n\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch(choice)
+        {
+            case 1:
+                fcfs();
+                break;
+
+            case 2:
+                sjf();
+                break;
+
+            case 3:
+                roundRobinPreemptive();
+                break;
+
+            case 4:
+                roundRobinNonPreemptive();
+                break;
+
+            case 5:
+                srtf();
+                break;
+
+            case 6:
+                priorityNonPreemptive();
+                break;
+
+            case 7:
+                priorityPreemptive();
+                break;
+
+            case 8:
+                printf("\nExiting Program...\n");
+                break;
+
+            default:
+                printf("\nInvalid Choice! Please try again.\n");
+        }
+
+    } while(choice != 8);
+
+    return 0;
+}
