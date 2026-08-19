@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <ctype.h>
+
+#define BUFFER_SIZE 100
+struct ResultData {
+    char reversed[BUFFER_SIZE];
+    int digit_sum;
+};
+int main()
+{
+    int pipe1[2], pipe2[2];
+    pid_t pid;
+    char input_str[BUFFER_SIZE];
+    struct ResultData result;
+    int len,i;
+    pipe(pipe1);
+    pipe(pipe2);
+    pid = fork();
+    if (pid == 0)
+    {
+        close(pipe1[1]);
+        close(pipe2[0]);
+        read(pipe1[0], input_str, sizeof(input_str));
+        result.digit_sum = 0;
+        len = strlen(input_str);
+        for (i = 0; i < len; i++)
+        {
+
+            result.reversed[i] = input_str[len - 1 - i];
+            if (isdigit((unsigned char)input_str[i])) {
+                result.digit_sum += (input_str[i] - '0');
+            }
+        }
+        result.reversed[len] = '\0';
+
+        write(pipe2[1], &result, sizeof(result));
+        close(pipe1[0]);
+        close(pipe2[1]);
+    }
+    else
+    {
+        close(pipe1[0]);
+        close(pipe2[1]);
+        printf("P1 (Parent)\n");
+        printf("Enter an alphanumeric string: ");
+        fgets(input_str, sizeof(input_str), stdin);
+        input_str[strcspn(input_str, "\n")] = '\0';
+        write(pipe1[1], input_str, strlen(input_str) + 1);
+        read(pipe2[0], &result, sizeof(result));
+        printf("\n--- Results ---\n");
+        printf("p2(child)\n");
+        printf("Reversed string = %s\n", result.reversed);
+        printf("Sum of digits   = %d\n", result.digit_sum);
+
+        close(pipe1[1]);
+        close(pipe2[0]);
+
+        wait(NULL);
+    }
+
+    return 0;
+}
