@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <string.h>
+struct message {
+long type;
+char text[100];
+};
+int main()
+{
+key_t key;
+int msgid;
+struct message msg;
+key = ftok("msgfile", 65);
+if (key == -1) { perror("ftok"); return 1; }
+msgid = msgget(key, 0666 | IPC_CREAT);
+if (msgid == -1) { perror("msgget"); return 1; }
+msg.type = 1;
+printf("Enter a message: ");
+if (fgets(msg.text, 100, stdin) != NULL) {
+msg.text[strcspn(msg.text, "\n")] = '\0'; // Drop raw newline entries
+}
+if (msgsnd(msgid, &msg, sizeof(msg.text), 0) == -1) {
+perror("msgsnd failed");
+return 1;
+}
+printf("Message sent.\n");
+return 0;
+}
